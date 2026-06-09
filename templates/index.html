@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>AI Assistant</title>
+
+    <style>
+        body {
+            font-family: Arial;
+            background: linear-gradient(to right, #0f2027, #203a43, #2c5364);
+            color: white;
+            text-align: center;
+        }
+
+        #chatbox {
+            height: 300px;
+            width: 60%;
+            margin: auto;
+            overflow-y: scroll;
+            background: black;
+            padding: 10px;
+            border-radius: 10px;
+        }
+
+        input {
+            padding: 10px;
+            width: 50%;
+            margin-top: 10px;
+        }
+
+        button {
+            padding: 10px 20px;
+            background: #00c9a7;
+            border: none;
+            color: white;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+
+        #summary {
+            margin-top: 20px;
+            width: 60%;
+            margin-left: auto;
+            margin-right: auto;
+            background: black;
+            padding: 10px;
+            border-radius: 10px;
+        }
+    </style>
+
+</head>
+<body>
+
+<h1>🤖 AI Assistant</h1>
+
+<h2>Chatbot</h2>
+
+<div id="chatbox"></div>
+
+<input type="text" id="message" placeholder="Type your message...">
+<br>
+<button onclick="sendMessage()">Send</button>
+
+<hr>
+
+<h2>📄 PDF Summarizer</h2>
+
+<input type="file" id="pdfFile">
+<br><br>
+<button onclick="uploadPDF()">Upload & Summarize</button>
+
+<div id="summary"></div>
+
+<script>
+
+function sendMessage() {
+    let msg = document.getElementById("message").value;
+
+    fetch("/chat", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({message: msg})
+    })
+    .then(res => res.json())
+    .then(data => {
+        let chatbox = document.getElementById("chatbox");
+
+        chatbox.innerHTML += "<p style='color:cyan'><b>You:</b> " + msg + "</p>";
+        chatbox.innerHTML += "<p style='color:lightgreen'><b>AI:</b> " + data.response + "</p>";
+
+        chatbox.scrollTop = chatbox.scrollHeight;
+    });
+}
+
+function uploadPDF() {
+    let file = document.getElementById("pdfFile").files[0];
+
+    let formData = new FormData();
+    formData.append("file", file);
+
+    fetch("/upload", {
+        method: "POST",
+        body: formData
+    })
+    .then(res => res.json())
+    .then(data => {
+        document.getElementById("summary").innerText = data.summary;
+    });
+}
+
+</script>
+
+</body>
+</html>
